@@ -1,36 +1,133 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TribeKnit — Connecting Communities
 
-## Getting Started
+**Our Neighborhood, Our Family.**
 
-First, run the development server:
+> A hyperlocal, AI-assisted neighborhood safety and community platform for residential areas in Pakistan.
+
+**🔗 Live App:** [https://neighbours-connect-ause.vercel.app](https://neighbours-connect-ause.vercel.app)
+**🔗 Source Code:** [https://github.com/hibahrehman25-lang/neighbours_connect](https://github.com/hibahrehman25-lang/neighbours_connect)
+
+---
+
+## 1. The Problem
+
+Modern life has quietly eroded something that used to be a given: knowing the people who live around you.
+
+Everyone is busy — work, studies, family — and the result is that most of us no longer know our neighbors beyond a nod in the parking lot. This isn't just a loss of community; it's a safety gap. When something actually goes wrong — a break-in, a medical emergency, someone falling seriously ill alone at home — many people hesitate to reach out. Out of embarrassment, or simply because they don't know *who* to ask, they either stay silent or, at best, tell one or two very close contacts. Help that could have arrived from three houses away never gets the chance to.
+
+The tools people currently use — WhatsApp groups, informal Facebook groups — are not built for this. They're noisy, they're not location-aware (a "neighborhood" WhatsApp group frequently includes people who don't actually live nearby), and nobody in them is verified to actually be a resident. There is no structure for urgency, no way to see what's happening within your literal walking distance, and no clean way to lend a hand — or ask for one — without it turning into either a public spectacle or an awkward one-on-one DM to someone you barely know.
+
+**TribeKnit exists to close that gap**: a lightweight, location-verified space where an entire residential community — defined by a real 1km radius, not a group someone happened to add you to — can quietly look out for each other.
+
+**Who it's for:** residents of housing societies and dense urban neighborhoods in Pakistan (the pilot design context is Lahore) who want a low-effort way to stay aware of and connected to the people physically closest to them — for safety, for small everyday help, and for the kind of casual community info-sharing (load-shedding updates, a lost pet, borrowing a drill) that used to happen over the boundary wall and now mostly doesn't.
+
+---
+
+## 2. What TribeKnit Does — Full Feature List
+
+### 🔐 Verified, Location-Based Accounts
+- Email + password signup with mandatory GPS location capture — every account is anchored to a real physical location, not a self-declared one.
+- Users upload a verification document (utility bill / ID) at signup. In this deployed version, verification auto-completes shortly after upload to keep the demo self-contained; in a production rollout this step would route to manual/admin review before a resident is marked **Verified**.
+- A **Verified Resident** badge is shown on every profile once this step completes, so neighbors can tell at a glance who has actually confirmed their address versus a pending account.
+
+### 📰 Hyperlocal Feed (1km Radius)
+- Every post is only visible to people within 1km of the poster — calculated live with the Haversine formula, with no paid mapping API involved.
+- Post categories: **General**, **Help Needed**, **Marketplace**, **Lost & Found**, **Emergency**.
+- Photo attachments on any post (useful for Lost & Found in particular — a missing pet or dropped ID card is far easier to identify with a picture).
+- Likes and comments on posts, with full edit and delete support on your own comments.
+- Delete your own posts at any time.
+- Report button on every post, for community moderation.
+- In-app **private messaging** — search for a neighbor by name, or message directly from their post, and talk one-to-one without leaving the app or exchanging phone numbers.
+- Real neighbor names and avatars on every post — this is not an anonymous board; it's your actual, verified block.
+
+### 🆘 SOS Emergency Alerts
+- A single, always-visible SOS button. One tap creates an emergency alert instantly.
+- The alert is pushed in **real time** (via Supabase's Realtime engine — no third-party SMS/notification service) to every other user within 1km, the moment it's sent.
+- Recipients get an audible alert plus a browser notification, and the alert appears live on their SOS screen without needing to refresh.
+- A live map shows the alert location with a visual 1km radius, so nearby neighbors can see roughly where help is needed.
+- If an alert is triggered by mistake, the sender can cancel/delete their own alert immediately.
+
+**Example scenario this was designed for:** a resident notices WAPDA has cut power to the block — instead of only telling the one or two neighbors they happen to have numbers for, they post it once, and everyone within 1km sees it. The same logic applies to a security concern, a fire, or a medical situation — one alert, the whole real neighborhood, in seconds.
+
+### 🛍️ Neighborhood Marketplace
+- Post items to **Sell, Rent, Borrow, or offer as a Service** — chairs and tables for an event, a spare drill machine, a bit of cash to be paid back, medicine someone urgently needs.
+- Each listing supports a photo and is geo-filtered to the same 1km radius as the Feed.
+- Message the lister directly and privately to work out the details.
+
+### 🗺️ Interactive Map View
+- Feed and SOS both offer a live map view (built with **Leaflet + OpenStreetMap** — deliberately chosen to avoid any paid Google Maps dependency) alongside the standard list view.
+- Posts are plotted as color-coded pins by category (red for Emergency, green for Marketplace, yellow for Lost & Found), so a resident can visually scan what's happening around them rather than scrolling a feed.
+- This spatial layer is what turns the AI-driven category classification (below) into something genuinely useful at a glance — a post is not just labeled correctly, it's placed correctly on the map that represents your real, physical block.
+
+---
+
+## 3. The AI Feature
+
+TribeKnit's AI layer is built on **Google's Gemini API**, called from a custom server-side route (`/api/classify`) with a system prompt written specifically for this app's context — not a generic wrapper.
+
+**What it does today:**
+
+1. **Automatic post classification.** Every post's text is sent to Gemini and classified into one of: `EMERGENCY`, `HELP_REQUEST`, `MARKETPLACE`, `GENERAL`. This runs regardless of which category the user manually selected in the dropdown — so if someone is in genuine distress and simply types "can't breathe, please help" without thinking to change the category dropdown, the AI still recognizes it and re-tags the post as an emergency. Human error at the moment of posting doesn't cost visibility.
+2. **AI-drafted response suggestions.** For posts classified as `HELP_REQUEST` or `MARKETPLACE`, Gemini also drafts a short, natural, Urdu-English-mixed reply that a neighbor could send — lowering the effort it takes for someone to actually respond and help.
+
+**The exact system prompt used:**
+**Model:** `gemini-2.0-flash`
+
+**Design decision — AI is best-effort, not a single point of failure.** If the Gemini API is temporarily rate-limited or unavailable, the post still publishes immediately using the user's manually selected category. The app never breaks or blocks a user because an external AI service is briefly unavailable — this was a deliberate reliability choice given that this is a safety-adjacent app.
+
+**Honest note on scope:** the current AI implementation is intentionally scoped to classification and response-drafting, which was the most reliable, testable feature achievable in the project timeline. It is the foundation for a broader AI roadmap (below) rather than the final ceiling of what this app's AI layer will do.
+
+**AI Roadmap (not yet implemented):**
+- Computer-vision matching for Lost & Found photos across posts in the same block.
+- Automatic clustering/detection when multiple nearby residents report the same issue (e.g., several "no light" posts in a short window flagged as a single area-wide outage).
+- Proactive matching — surfacing a "Borrow" request to specific neighbors whose past posts suggest they own the relevant item.
+
+---
+
+## 4. Tools, Services & Technologies Used
+
+| Layer | Technology |
+|---|---|
+| Frontend framework | Next.js 16 (App Router), TypeScript, Tailwind CSS |
+| Backend / Database | Supabase — PostgreSQL, Authentication, Realtime, Storage |
+| AI | Google Gemini API (`gemini-2.0-flash`) |
+| Maps | Leaflet + OpenStreetMap (free, no API key required) |
+| Branding / Logo | Canva |
+| Hosting / Deployment | Vercel |
+| Email (auth confirmation) | Supabase Auth email + Resend (free tier) |
+
+---
+
+## 5. Supabase's Role & Its Free-Tier Limitations (Transparency Note)
+
+Supabase powers the entire backend of this app: the Postgres database, all authentication, the Realtime channels behind SOS alerts and private messaging, and file storage for post/marketplace photos. Every table (`profiles`, `posts`, `marketplace_items`, `sos_alerts`, `likes`, `comments`, `messages`, `reports`) is protected with Row Level Security policies, so a user can only read or modify data they're actually authorized to touch.
+
+Being built entirely on free tiers, two limitations are worth being upfront about:
+
+- **Email delivery is rate-limited.** Both Supabase's built-in auth email and the free tier of Resend (used for confirmation emails) restrict how many emails can be sent per hour on a free plan, and Resend's free sender can only reliably deliver to the address the account was registered with. This does **not** affect account creation itself, or how many users the app can support — Supabase's free tier supports up to 50,000 users. It only affects *email confirmation speed* during heavy testing.
+- **To remove any friction for evaluation**, a pre-verified demo account is provided below that bypasses email confirmation entirely, so the app can be used immediately without waiting on any email.
+
+### Demo Account (Recommended for Evaluation)
+This account is pre-populated with sample posts and marketplace listings and shares its location with existing test data, so real content is visible immediately on login — no empty-feed problem.
+
+---
+
+## 6. Screenshots
+
+*(Add 3–4 screenshots here before submission — Feed, SOS with map, Marketplace, and a post with the AI-suggested reply visible. Example format below.)*
+
+| Feed | SOS Alert + Map | Marketplace |
+|---|---|---|
+| ![Feed](./screenshots/feed.png) | ![SOS](./screenshots/sos.png) | ![Marketplace](./screenshots/marketplace.png) |
+
+---
+
+## 7. How to Run This Project Locally
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/hibahrehman25-lang/neighbours_connect.git
+cd neighbours_connect
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Create a `.env.local` file in the project root:
