@@ -1,10 +1,10 @@
 'use client'
-export const dynamic = 'force-dynamic'
-import { useState } from 'react'
+
+import { Suspense, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
-export default function ConfirmPage() {
+function ConfirmContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [status, setStatus] = useState<'idle' | 'verifying' | 'error'>('idle')
@@ -110,5 +110,13 @@ export default function ConfirmPage() {
         </button>
       </div>
     </div>
+  )
+}
+
+export default function ConfirmPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#F5EFE3]" />}>
+      <ConfirmContent />
+    </Suspense>
   )
 }

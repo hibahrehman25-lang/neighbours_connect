@@ -1,6 +1,6 @@
 'use client'
-export const dynamic = 'force-dynamic'
-import { useEffect, useState, useRef } from 'react'
+
+import { Suspense, useEffect, useState, useRef } from 'react'
 import { useRouter, useParams, useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
@@ -12,7 +12,7 @@ type Message = {
   created_at: string
 }
 
-export default function ChatPage() {
+function ChatContent() {
   const router = useRouter()
   const params = useParams()
   const searchParams = useSearchParams()
@@ -119,7 +119,7 @@ export default function ChatPage() {
     <div className="min-h-screen bg-gradient-to-b from-[#F5EFE3] to-[#EDE4D3] flex flex-col">
       <header className="bg-gradient-to-r from-[#0F5C5C] via-[#1A7A6E] to-[#0F5C5C] sticky top-0 z-10 shadow-md">
         <div className="max-w-lg mx-auto px-4 py-3 flex items-center gap-3">
-          <button onClick={() => router.back()} className="text-white text-lg font-bold">←</button>
+          <button onClick={() => router.back()} className="text-white text-lg">←</button>
           <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-white text-sm font-medium">
             {otherUserName.slice(0, 1).toUpperCase()}
           </div>
@@ -143,7 +143,7 @@ export default function ChatPage() {
                   key={msg.id}
                   className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}
                 >
-               <div
+                  <div
                     className={`max-w-[75%] rounded-2xl px-4 py-2 text-sm shadow-sm ${
                       isMine
                         ? 'bg-gradient-to-br from-[#D85A30] to-[#B84322] text-white'
@@ -151,7 +151,7 @@ export default function ChatPage() {
                     }`}
                   >
                     {msg.content}
-                  </div>   
+                  </div>
                 </div>
               )
             })}
@@ -180,5 +180,13 @@ export default function ChatPage() {
         </button>
       </form>
     </div>
+  )
+}
+
+export default function ChatPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#F5EFE3]" />}>
+      <ChatContent />
+    </Suspense>
   )
 }
