@@ -11,38 +11,36 @@ TribeKnit helps residents connect with verified neighbors living within a **1 km
 **💻 Source Code:** https://github.com/hibahrehman25-lang/neighbours_connect
 
 ---
-## 📸 Screenshot
-
+#
 ## 📸 Screenshots
 
-### Home Feed (Map View)
 ![Map View](https://github.com/hibahrehman25-lang/neighbours_connect/blob/main/Screenshot%202026-07-26%20214225.png)
 
-### SOS Alert with AI Guidance
+
 ![SOS Alert](https://github.com/hibahrehman25-lang/neighbours_connect/blob/main/Screenshot%202026-07-26%20214205.png)
 
-### Marketplace Listings
+
 ![Marketplace](https://github.com/hibahrehman25-lang/neighbours_connect/blob/main/Screenshot%202026-07-26%20214139.png)
 
-### Post Details and Interaction
+
 ![Post Interaction](https://github.com/hibahrehman25-lang/neighbours_connect/blob/main/Screenshot%202026-07-26%20214019.png)
 
-### Neighborhood Feed
+
 ![Neighborhood Feed](https://github.com/hibahrehman25-lang/neighbours_connect/blob/main/Screenshot%202026-07-26%20213904.png)
 
-### Private Messaging
+
 ![Private Messaging](https://github.com/hibahrehman25-lang/neighbours_connect/blob/main/Screenshot%202026-07-26%20213839.png)
 
-### Nearby Residents Search
+
 ![Nearby Search](https://github.com/hibahrehman25-lang/neighbours_connect/blob/main/Screenshot%202026-07-26%20213738.png)
 
-### Marketplace Filters
+
 ![Marketplace Filters](https://github.com/hibahrehman25-lang/neighbours_connect/blob/main/Screenshot%202026-07-26%20213603.png)
 
-### Create New Post
+
 ![Create Post](https://github.com/hibahrehman25-lang/neighbours_connect/blob/main/Screenshot%202026-07-26%20213408.png)
 
-### Additional Map View
+
 ![Map View 2](https://github.com/hibahrehman25-lang/neighbours_connect/blob/main/Screenshot%202026-07-26%20213253.png)
 
 
