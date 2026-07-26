@@ -533,24 +533,24 @@ export default function FeedPage() {
         <div className="max-w-lg mx-auto px-4 pb-3 relative">
           <input
             type="text"
-            placeholder="Search a neighbor to start a private chat..."
+            placeholder="Search a neighbor, e.g. Hibah Rehman or Demo..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-full px-4 py-2 text-sm bg-white/95 focus:outline-none focus:ring-2 focus:ring-[#5DCAA5]"
+            className="w-full rounded-full px-4 py-2 text-sm bg-white/95 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5DCAA5]"
           />
 
           {searchQuery.trim().length === 0 && (
-            <p className="mt-2 px-1 text-[11px] text-gray-500">
-              Find someone nearby and message them directly
+            <p className="mt-2 px-1 text-[12px] sm:text-[11px] leading-tight text-gray-600">
+              Type a real name to test private messaging, like Hibah Rehman or Demo.
             </p>
           )}
 
           {searchQuery.trim().length > 0 && (
             <div className="absolute left-4 right-4 mt-1 bg-white rounded-xl shadow-lg z-20 max-h-64 overflow-y-auto">
               {searching ? (
-                <p className="text-center text-gray-400 text-xs py-4">Searching...</p>
+                <p className="text-center text-gray-500 text-xs py-4">Searching...</p>
               ) : searchResults.length === 0 ? (
-                <p className="text-center text-gray-400 text-xs py-4">No neighbors found.</p>
+                <p className="text-center text-gray-500 text-xs py-4">No neighbors found.</p>
               ) : (
                 searchResults.map((result) => (
                   <div
@@ -583,7 +583,7 @@ export default function FeedPage() {
             <div className="flex items-center justify-between mb-3">
               <div>
                 <p className="text-sm font-semibold text-[#2D3436]">Neighborhood map</p>
-                <p className="text-[11px] text-gray-500">Map-first view for nearby posts and zones</p>
+                <p className="text-[12px] sm:text-[11px] leading-tight text-gray-600">Map-first view for nearby posts and zones</p>
               </div>
               <button
                 onClick={() => setShowMap(false)}
@@ -632,7 +632,7 @@ export default function FeedPage() {
               ))}
             </div>
 
-            <div className="mt-3 flex items-center justify-between text-[11px] text-gray-500">
+            <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between text-[12px] sm:text-[11px] leading-tight text-gray-600">
               <span>Radius shows your 1km neighborhood boundary.</span>
               <button onClick={() => setShowMap(false)} className="font-medium text-[#0F5C5C]">
                 Switch to list
@@ -689,9 +689,9 @@ export default function FeedPage() {
         </form>
 
         {loading ? (
-          <p className="text-center text-gray-400 text-sm">Loading...</p>
+          <p className="text-center text-gray-500 text-sm">Loading...</p>
         ) : posts.length === 0 ? (
-          <p className="text-center text-gray-400 text-sm py-10">
+          <p className="text-center text-gray-600 text-sm py-10">
             No nearby posts yet within 1km of your location.
           </p>
         ) : (
@@ -759,7 +759,7 @@ export default function FeedPage() {
                       Message
                     </Link>
                   )}
-                  <span className="text-gray-400 ml-auto">
+                  <span className="text-gray-500 ml-auto">
                     {post.distance !== undefined ? post.distance.toFixed(1) : '0'} km away
                   </span>
                 </div>
