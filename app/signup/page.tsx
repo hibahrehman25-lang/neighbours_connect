@@ -20,32 +20,38 @@ export default function SignupPage() {
     setError('')
     setLoading(true)
 
-    if (!navigator.geolocation) {
-      setError('Location access is required to sign up.')
-      setLoading(false)
-      return
-    }
+    const useFallbackLocation = () => ({ latitude: 31.5204, longitude: 74.3587 })
 
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const { latitude, longitude } = position.coords
+    const continueSignup = async (latitude: number, longitude: number) => {
+      localStorage.setItem(
+        'signupData',
+        JSON.stringify({
+          fullName,
+          phone,
+          area,
+          email,
+          latitude,
+          longitude,
+          mode: 'signup',
+        })
+      )
 
-        localStorage.setItem(
-          'signupData',
-          JSON.stringify({
-            fullName,
-            phone,
-            area,
-            email,
-            latitude,
-            longitude,
-            mode: 'signup',
-          })
-        )
+      try {
+        const redirectTo = typeof window !== 'undefined' ? `${window.location.origin}/auth/confirm` : undefined
 
-        const { error: signUpError } = await supabase.auth.signUp({
+        const { data, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
+          options: redirectTo
+            ? {
+                emailRedirectTo: redirectTo,
+                data: {
+                  full_name: fullName,
+                  phone,
+                  area,
+                },
+              }
+            : undefined,
         })
 
         setLoading(false)
@@ -61,11 +67,31 @@ export default function SignupPage() {
         }
 
         router.push(`/check-email?email=${encodeURIComponent(email)}`)
-      },
-      () => {
-        setError('Location permission is required to sign up.')
+      } catch (error: any) {
         setLoading(false)
+        const message = error?.message?.toLowerCase() || ''
+        if (message.includes('already registered') || message.includes('already exists')) {
+          setError('This email is already registered. Please log in instead.')
+        } else {
+          setError('Something went wrong. Please check your details and try again.')
+        }
       }
+    }
+
+    if (!navigator.geolocation) {
+      await continueSignup(useFallbackLocation().latitude, useFallbackLocation().longitude)
+      return
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        await continueSignup(position.coords.latitude, position.coords.longitude)
+      },
+      async () => {
+        const fallback = useFallbackLocation()
+        await continueSignup(fallback.latitude, fallback.longitude)
+      },
+      { timeout: 7000 }
     )
   }
 

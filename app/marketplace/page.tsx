@@ -18,7 +18,7 @@ type Item = {
   distance?: number
   image_url?: string | null
   user_id: string
-  profiles?: { full_name: string } | null
+  profiles?: { full_name: string; verification_status?: string | null } | null
 }
 
 const TYPE_STYLES: Record<string, string> = {
@@ -46,6 +46,11 @@ export default function MarketplacePage() {
   const [loading, setLoading] = useState(true)
   const [posting, setPosting] = useState(false)
   const [userLoc, setUserLoc] = useState<{ lat: number; lon: number } | null>(null)
+  const [typeFilter, setTypeFilter] = useState('ALL')
+  const [maxDistanceFilter, setMaxDistanceFilter] = useState('1')
+  const [minPriceFilter, setMinPriceFilter] = useState('')
+  const [maxPriceFilter, setMaxPriceFilter] = useState('')
+  const [verifiedOnly, setVerifiedOnly] = useState(false)
 
   useEffect(() => {
     init()
@@ -87,7 +92,7 @@ export default function MarketplacePage() {
 
     const { data, error } = await supabase
       .from('marketplace_items')
-      .select('*, profiles(full_name)')
+      .select('*, profiles(full_name, verification_status)')
       .order('created_at', { ascending: false })
 
     if (error) {
@@ -189,6 +194,39 @@ export default function MarketplacePage() {
           .slice(0, 2)
       : '?'
 
+  const parsePriceValue = (rawPrice: string) => {
+    if (!rawPrice) return null
+    if (rawPrice.toLowerCase().includes('free')) return 0
+
+    const match = rawPrice.replace(/,/g, '').match(/\d+(\.\d+)?/)
+    return match ? Number(match[0]) : null
+  }
+
+  const filteredItems = items.filter((item) => {
+    if (typeFilter !== 'ALL' && item.type !== typeFilter) return false
+
+    const maxDistance = Number(maxDistanceFilter)
+    if (!Number.isNaN(maxDistance) && item.distance !== undefined && item.distance > maxDistance) {
+      return false
+    }
+
+    if (verifiedOnly && item.profiles?.verification_status !== 'verified') return false
+
+    const priceValue = parsePriceValue(item.price)
+    const minPrice = minPriceFilter === '' ? null : Number(minPriceFilter)
+    const maxPrice = maxPriceFilter === '' ? null : Number(maxPriceFilter)
+
+    if (minPrice !== null && !Number.isNaN(minPrice)) {
+      if (priceValue === null || priceValue < minPrice) return false
+    }
+
+    if (maxPrice !== null && !Number.isNaN(maxPrice)) {
+      if (priceValue === null || priceValue > maxPrice) return false
+    }
+
+    return true
+  })
+
   return (
     <div className="min-h-screen bg-[#F5EFE3] pb-20">
       <header className="bg-[#0F5C5C] sticky top-0 z-10">
@@ -261,15 +299,78 @@ export default function MarketplacePage() {
           </button>
         </form>
 
+        <div className="bg-white rounded-xl shadow-sm p-4 mb-6 border border-gray-100">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <p className="text-sm font-semibold text-[#2D3436]">Marketplace filters</p>
+              <p className="text-[11px] text-gray-500">Quickly narrow down useful nearby listings</p>
+            </div>
+            <p className="text-[11px] text-gray-500">{filteredItems.length} shown</p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <select
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e.target.value)}
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white"
+            >
+              <option value="ALL">All types</option>
+              <option value="SELL">Sell</option>
+              <option value="RENT">Rent</option>
+              <option value="BORROW">Borrow</option>
+              <option value="SERVICE">Service</option>
+            </select>
+
+            <select
+              value={maxDistanceFilter}
+              onChange={(e) => setMaxDistanceFilter(e.target.value)}
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white"
+            >
+              <option value="1">Within 1 km</option>
+              <option value="0.75">Within 750 m</option>
+              <option value="0.5">Within 500 m</option>
+            </select>
+
+            <input
+              type="number"
+              inputMode="numeric"
+              placeholder="Min price"
+              value={minPriceFilter}
+              onChange={(e) => setMinPriceFilter(e.target.value)}
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white"
+            />
+            <input
+              type="number"
+              inputMode="numeric"
+              placeholder="Max price"
+              value={maxPriceFilter}
+              onChange={(e) => setMaxPriceFilter(e.target.value)}
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white"
+            />
+          </div>
+
+          <label className="mt-3 flex items-center gap-2 text-sm text-[#2D3436]">
+            <input
+              type="checkbox"
+              checked={verifiedOnly}
+              onChange={(e) => setVerifiedOnly(e.target.checked)}
+              className="h-4 w-4 accent-[#0F5C5C]"
+            />
+            Verified users only
+          </label>
+        </div>
+
         {loading ? (
           <p className="text-center text-gray-400 text-sm">Loading...</p>
-        ) : items.length === 0 ? (
+        ) : filteredItems.length === 0 ? (
           <p className="text-center text-gray-400 text-sm py-10">
-            No items yet within 1km of your location.
+            {items.length === 0
+              ? 'No items yet within 1km of your location.'
+              : 'No items match your current filters.'}
           </p>
         ) : (
           <div className="space-y-3">
-            {items.map((item) => (
+            {filteredItems.map((item) => (
               <div key={item.id} className="bg-white rounded-xl shadow-sm p-4">
                {item.image_url && (
                   <a href={item.image_url} target="_blank" rel="noopener noreferrer">
@@ -305,6 +406,9 @@ export default function MarketplacePage() {
                     </div>
                     <p className="text-xs text-gray-500">
                       {item.profiles?.full_name || 'Neighbor'}
+                      {item.profiles?.verification_status === 'verified' && (
+                        <span className="ml-2 text-[10px] font-medium text-[#0F5C5C]">Verified</span>
+                      )}
                     </p>
                   </div>
                   <Link

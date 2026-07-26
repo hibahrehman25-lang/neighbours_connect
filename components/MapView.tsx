@@ -20,16 +20,27 @@ export type MapPin = {
   color: string
 }
 
+export type MapZone = {
+  id: string
+  lat: number
+  lon: number
+  radius: number
+  color: string
+  fillOpacity: number
+}
+
 export default function MapView({
   centerLat,
   centerLon,
   pins,
   showRadius,
+  zones,
 }: {
   centerLat: number
   centerLon: number
   pins: MapPin[]
   showRadius?: boolean
+  zones?: MapZone[]
 }) {
   return (
     <MapContainer
@@ -48,6 +59,19 @@ export default function MapView({
           pathOptions={{ color: '#D85A30', fillColor: '#D85A30', fillOpacity: 0.1 }}
         />
       )}
+      {zones?.map((zone) => (
+        <Circle
+          key={zone.id}
+          center={[zone.lat, zone.lon]}
+          radius={zone.radius}
+          pathOptions={{
+            color: zone.color,
+            fillColor: zone.color,
+            fillOpacity: zone.fillOpacity,
+            weight: 1,
+          }}
+        />
+      ))}
       {pins.map((pin) => (
         <Marker key={pin.id} position={[pin.lat, pin.lon]} icon={createIcon(pin.color)}>
           <Popup>{pin.label}</Popup>

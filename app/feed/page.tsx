@@ -65,7 +65,7 @@ export default function FeedPage() {
   const [category, setCategory] = useState('GENERAL')
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [loading, setLoading] = useState(true)
-  const [showMap, setShowMap] = useState(false)
+  const [showMap, setShowMap] = useState(true)
   const [posting, setPosting] = useState(false)
   const [userLoc, setUserLoc] = useState<{ lat: number; lon: number } | null>(null)
   const [currentUserId, setCurrentUserId] = useState<string | null>(null)
@@ -486,6 +486,43 @@ export default function FeedPage() {
       profiles: comment.profiles ? { full_name: String(comment.profiles.full_name ?? '') } : null,
     }))
 
+  const feedZones = userLoc
+    ? [
+        {
+          id: 'urgent-zone',
+          label: 'Emergency zone',
+          count: posts.filter((post) => post.category === 'EMERGENCY').length,
+          radius: 450,
+          color: '#D93E3E',
+          fillOpacity: 0.12,
+        },
+        {
+          id: 'help-zone',
+          label: 'Help requests',
+          count: posts.filter((post) => post.category === 'HELP_REQUEST').length,
+          radius: 650,
+          color: '#0F5C5C',
+          fillOpacity: 0.08,
+        },
+        {
+          id: 'market-zone',
+          label: 'Marketplace zone',
+          count: posts.filter((post) => post.category === 'MARKETPLACE').length,
+          radius: 800,
+          color: '#3B7A3A',
+          fillOpacity: 0.08,
+        },
+        {
+          id: 'quiet-zone',
+          label: 'Quiet / safe area',
+          count: posts.filter((post) => post.category === 'GENERAL').length,
+          radius: 1000,
+          color: '#8E8E8E',
+          fillOpacity: 0.04,
+        },
+      ]
+    : []
+
   return (
     <div className="min-h-screen bg-[#F5EFE3] pb-20">
       <header className="bg-[#0F5C5C] sticky top-0 z-10">
@@ -541,6 +578,69 @@ export default function FeedPage() {
       </header>
 
       <div className="max-w-lg mx-auto px-4 py-4">
+        {showMap && userLoc && (
+          <div className="mb-4 rounded-xl bg-white border border-gray-200 shadow-sm p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <p className="text-sm font-semibold text-[#2D3436]">Neighborhood map</p>
+                <p className="text-[11px] text-gray-500">Map-first view for nearby posts and zones</p>
+              </div>
+              <button
+                onClick={() => setShowMap(false)}
+                className="text-xs font-medium text-[#0F5C5C]"
+              >
+                Hide map
+              </button>
+            </div>
+            <MapView
+              centerLat={userLoc.lat}
+              centerLon={userLoc.lon}
+              showRadius={true}
+              zones={feedZones.map((zone) => ({
+                id: zone.id,
+                lat: userLoc.lat,
+                lon: userLoc.lon,
+                radius: zone.radius,
+                color: zone.color,
+                fillOpacity: zone.fillOpacity,
+              }))}
+              pins={posts.map((p) => ({
+                id: p.id,
+                lat: p.latitude,
+                lon: p.longitude,
+                label: p.content.slice(0, 40),
+                color:
+                  p.category === 'EMERGENCY'
+                    ? '#D93E3E'
+                    : p.category === 'LOST_FOUND'
+                    ? '#EF9F27'
+                    : p.category === 'MARKETPLACE'
+                    ? '#3DA35D'
+                    : '#0F5C5C',
+              }))}
+            />
+
+            <div className="mt-3 grid grid-cols-2 gap-2 text-[11px] text-[#2D3436]">
+              {feedZones.map((zone) => (
+                <div key={zone.id} className="rounded-lg border border-gray-200 bg-[#FAFAF7] px-3 py-2">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: zone.color }} />
+                    <span className="font-medium">{zone.label}</span>
+                  </div>
+                  <p className="text-gray-500 mt-1">{zone.count} nearby</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-3 flex items-center justify-between text-[11px] text-gray-500">
+              <span>Radius shows your 1km neighborhood boundary.</span>
+              <button onClick={() => setShowMap(false)} className="font-medium text-[#0F5C5C]">
+                Switch to list
+              </button>
+            </div>
+          </div>
+        )}
+
         <form onSubmit={handlePost} className="bg-white rounded-xl shadow-sm p-4 mb-6">
           <textarea
             placeholder="What's happening in your neighborhood?"
@@ -619,39 +719,17 @@ export default function FeedPage() {
               }))}
             />
           </div>
-        )}
 
-        {loading ? (
-          <p className="text-center text-gray-400 text-sm">Loading...</p>
-        ) : posts.length === 0 ? (
-          <p className="text-center text-gray-400 text-sm py-10">
-            No posts yet within 1km of your location.
-          </p>
-        ) : (
-          <div className="space-y-3">
-            {posts.map((post) => (
-              <div key={post.id} className="bg-white rounded-xl shadow-sm p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-8 h-8 rounded-full bg-[#0F5C5C] text-white text-xs font-medium flex items-center justify-center flex-shrink-0">
-                    {initials(post.profiles?.full_name)}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-[#2D3436] truncate">
-                      {post.profiles?.full_name || 'Neighbor'}
-                    </p>
-                    <p className="text-xs text-gray-400">
-                      {new Date(post.created_at).toLocaleString('en-PK', { timeZone: 'Asia/Karachi', dateStyle: 'medium', timeStyle: 'short' })}
-                    </p>
-                  </div>
-                  <span
-                    className={`text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0 ${CATEGORY_STYLES[post.category]}`}
-                  >
-                    {CATEGORY_LABELS[post.category]}
-                  </span>
-                </div>
-
-                <p className="text-gray-800 text-sm">{post.content}</p>
-
+                  {!showMap && userLoc && (
+                    <div className="mb-4 flex justify-end">
+                      <button
+                        onClick={() => setShowMap(true)}
+                        className="flex items-center gap-1.5 text-xs bg-white border border-gray-200 shadow-sm px-4 py-2 rounded-full font-medium text-[#0F5C5C]"
+                      >
+                        📍 Show map
+                      </button>
+                    </div>
+                  )}
                 {post.image_url && (
                   <a href={post.image_url} target="_blank" rel="noopener noreferrer">
                     <img

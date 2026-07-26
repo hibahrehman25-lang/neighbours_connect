@@ -101,6 +101,27 @@ export default function SosPage() {
     }
   }
 
+  const sosZones = userLoc
+    ? [
+        {
+          id: 'active-sos-zone',
+          label: 'Active SOS area',
+          count: nearbyAlerts.length,
+          radius: 500,
+          color: '#D93E3E',
+          fillOpacity: 0.12,
+        },
+        {
+          id: 'quiet-sos-zone',
+          label: 'Quiet / safe area',
+          count: Math.max(0, 1 - nearbyAlerts.length),
+          radius: 1000,
+          color: '#8E8E8E',
+          fillOpacity: 0.04,
+        },
+      ]
+    : []
+
  const playAlertSound = () => {
     const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)()
 
@@ -222,12 +243,54 @@ const deleteAlert = async (alertId: string) => {
         </div>
       </header>
 
-      <div className="max-w-lg mx-auto px-4 py-10 text-center">
+      <div className="max-w-lg mx-auto px-4 py-6 text-center">
+        {userLoc && (
+          <div className="rounded-xl bg-white border border-gray-200 shadow-sm p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="text-left">
+                <p className="text-sm font-semibold text-[#2D3436]">Live SOS map</p>
+                <p className="text-[11px] text-gray-500">Nearby alerts and neighborhood zones</p>
+              </div>
+            </div>
+            <MapView
+              centerLat={userLoc.lat}
+              centerLon={userLoc.lon}
+              showRadius={true}
+              zones={sosZones.map((zone) => ({
+                id: zone.id,
+                lat: userLoc.lat,
+                lon: userLoc.lon,
+                radius: zone.radius,
+                color: zone.color,
+                fillOpacity: zone.fillOpacity,
+              }))}
+              pins={nearbyAlerts.map((a) => ({
+                id: a.id,
+                lat: a.latitude,
+                lon: a.longitude,
+                label: 'Emergency alert',
+                color: '#D93E3E',
+              }))}
+            />
+            <div className="mt-3 grid grid-cols-2 gap-2 text-[11px] text-[#2D3436]">
+              {sosZones.map((zone) => (
+                <div key={zone.id} className="rounded-lg border border-gray-200 bg-[#FAFAF7] px-3 py-2 text-left">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: zone.color }} />
+                    <span className="font-medium">{zone.label}</span>
+                  </div>
+                  <p className="text-gray-500 mt-1">{zone.count} nearby</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="What's happening? (optional — e.g. fire, break-in, medical)"
-          className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm focus:border-[#0F5C5C] focus:outline-none"
+          className="w-full mt-4 rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm focus:border-[#0F5C5C] focus:outline-none"
           rows={3}
         />
 
@@ -238,23 +301,6 @@ const deleteAlert = async (alertId: string) => {
         >
           {sending ? '...' : 'SOS'}
         </button>
-
-        {userLoc && (
-          <div className="mt-6 rounded-2xl overflow-hidden border border-gray-200 shadow-sm">
-            <MapView
-              centerLat={userLoc.lat}
-              centerLon={userLoc.lon}
-              showRadius={true}
-              pins={nearbyAlerts.map((a) => ({
-                id: a.id,
-                lat: a.latitude,
-                lon: a.longitude,
-                label: 'Emergency alert',
-                color: '#D93E3E',
-              }))}
-            />
-          </div>
-        )}
 
         {sent && (
           <div className="mt-4 bg-[#FCEBEB] text-[#791F1F] rounded-lg px-4 py-2 text-sm">
