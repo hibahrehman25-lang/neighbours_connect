@@ -116,7 +116,7 @@ function ChatContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#F5EFE3] to-[#EDE4D3] flex flex-col">
+    <div className="min-h-screen bg-[#F5EFE3] flex flex-col">
       <header className="bg-gradient-to-r from-[#0F5C5C] via-[#1A7A6E] to-[#0F5C5C] sticky top-0 z-10 shadow-md">
         <div className="max-w-lg mx-auto px-4 py-3 flex items-center gap-3">
           <button onClick={() => router.back()} className="text-white text-lg">←</button>
@@ -127,30 +127,37 @@ function ChatContent() {
         </div>
       </header>
 
-      <div className="flex-1 max-w-lg w-full mx-auto px-4 py-4 overflow-y-auto">
+      <div className="flex-1 max-w-lg w-full mx-auto px-3 py-3 overflow-y-auto bg-[radial-gradient(circle_at_top_left,_rgba(15,92,92,0.04)_0,_transparent_35%),linear-gradient(135deg,_rgba(255,255,255,0.55)_0%,_rgba(245,239,227,0.75)_100%)]">
         {loading ? (
-          <p className="text-center text-gray-400 text-sm">Loading...</p>
+          <p className="text-center text-gray-400 text-sm py-10">Loading...</p>
         ) : messages.length === 0 ? (
-          <p className="text-center text-gray-400 text-sm py-10">
+          <div className="rounded-2xl border border-dashed border-gray-300 bg-white/70 px-4 py-6 text-center text-gray-500 text-sm shadow-sm">
             No messages yet. Say hello!
-          </p>
+          </div>
         ) : (
-          <div className="space-y-2">
-            {messages.map((msg) => {
+          <div className="space-y-1.5">
+            {messages.map((msg, index) => {
               const isMine = msg.sender_id === currentUserId
+              const prevMsg = messages[index - 1]
+              const sameSender = prevMsg?.sender_id === msg.sender_id
               return (
                 <div
                   key={msg.id}
-                  className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}
+                  className={`flex ${isMine ? 'justify-end' : 'justify-start'} ${sameSender ? 'mt-1' : 'mt-2.5'}`}
                 >
                   <div
-                    className={`max-w-[75%] rounded-2xl px-4 py-2 text-sm shadow-sm ${
+                    className={`relative max-w-[82%] rounded-2xl px-3.5 py-2.5 text-sm shadow-sm ${
                       isMine
                         ? 'bg-gradient-to-br from-[#D85A30] to-[#B84322] text-white'
                         : 'bg-white text-[#2D3436] border border-gray-100'
                     }`}
                   >
-                    {msg.content}
+                    <div className="whitespace-pre-wrap break-words">{msg.content}</div>
+                    {isMine && (
+                      <span className="ml-2 inline-block align-text-bottom text-[10px] opacity-80">
+                        ✓
+                      </span>
+                    )}
                   </div>
                 </div>
               )
@@ -162,22 +169,25 @@ function ChatContent() {
 
       <form
         onSubmit={handleSend}
-        className="bg-white border-t px-4 py-3 flex gap-2 max-w-lg w-full mx-auto"
+        className="sticky bottom-0 bg-transparent px-3 py-3 max-w-lg w-full mx-auto"
       >
-        <input
-          type="text"
-          placeholder="Type a message..."
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          className="flex-1 border border-gray-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F5C5C]"
-        />
-        <button
-          type="submit"
-          disabled={sending}
-          className="bg-[#D85A30] text-white px-4 py-2 rounded-full text-sm font-medium disabled:opacity-50"
-        >
-          Send
-        </button>
+        <div className="flex items-center gap-2 rounded-full border border-gray-200 bg-white/95 px-2 py-2 shadow-sm">
+          <input
+            type="text"
+            placeholder="Type a message..."
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            className="flex-1 bg-transparent px-3 py-2 text-sm text-[#2D3436] placeholder:text-gray-400 focus:outline-none"
+          />
+          <button
+            type="submit"
+            disabled={sending}
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0F5C5C] text-white shadow-sm disabled:opacity-50"
+            aria-label="Send message"
+          >
+            <span className="text-base">➤</span>
+          </button>
+        </div>
       </form>
     </div>
   )

@@ -354,7 +354,7 @@ export default function FeedPage() {
 
       setPosts((prev) =>
         prev.map((p) =>
-          p.id === postId ? { ...p, comments: data || [], commentsOpen: true } : p
+          p.id === postId ? { ...p, comments: normalizeComments(data || []), commentsOpen: true } : p
         )
       )
     } else {
@@ -402,7 +402,7 @@ export default function FeedPage() {
 
     setPosts((prev) =>
       prev.map((p) =>
-        p.id === postId ? { ...p, comments: data || [], newComment: '' } : p
+        p.id === postId ? { ...p, comments: normalizeComments(data || []), newComment: '' } : p
       )
     )
   }
@@ -435,7 +435,7 @@ export default function FeedPage() {
       .order('created_at', { ascending: true })
 
     setPosts((prev) =>
-      prev.map((p) => (p.id === postId ? { ...p, comments: data || [] } : p))
+      prev.map((p) => (p.id === postId ? { ...p, comments: normalizeComments(data || []) } : p))
     )
   }
 
@@ -480,6 +480,12 @@ export default function FeedPage() {
           .slice(0, 2)
       : '?'
 
+  const normalizeComments = (comments: any[]): Comment[] =>
+    comments.map((comment: any) => ({
+      ...comment,
+      profiles: comment.profiles ? { full_name: String(comment.profiles.full_name ?? '') } : null,
+    }))
+
   return (
     <div className="min-h-screen bg-[#F5EFE3] pb-20">
       <header className="bg-[#0F5C5C] sticky top-0 z-10">
@@ -490,11 +496,17 @@ export default function FeedPage() {
         <div className="max-w-lg mx-auto px-4 pb-3 relative">
           <input
             type="text"
-            placeholder="Search neighbors by name..."
+            placeholder="Search a neighbor to start a private chat..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full rounded-full px-4 py-2 text-sm bg-white/95 focus:outline-none focus:ring-2 focus:ring-[#5DCAA5]"
           />
+
+          {searchQuery.trim().length === 0 && (
+            <p className="mt-2 px-1 text-[11px] text-gray-500">
+              Find someone nearby and message them directly
+            </p>
+          )}
 
           {searchQuery.trim().length > 0 && (
             <div className="absolute left-4 right-4 mt-1 bg-white rounded-xl shadow-lg z-20 max-h-64 overflow-y-auto">
