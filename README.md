@@ -4,7 +4,8 @@
 
 > A hyperlocal, AI-assisted neighborhood safety and community platform for residential areas in Pakistan.
 
-**🔗 Live App:** [https://neighbours-connect-ause.vercel.app](https://neighbours-connect-ause.vercel.app)
+**🔗 Live App:**[https://neighbours-connect-ause.vercel.app]
+[https://neighbours-connect-ause.vercel.app](https://neighbours-connect-ause.vercel.app)
 **🔗 Source Code:** [https://github.com/hibahrehman25-lang/neighbours_connect](https://github.com/hibahrehman25-lang/neighbours_connect)
 
 ---
@@ -71,6 +72,14 @@ TribeKnit's AI layer is built on **Google's Gemini API**, called from a custom s
 2. **AI-drafted response suggestions.** For posts classified as `HELP_REQUEST` or `MARKETPLACE`, Gemini also drafts a short, natural, Urdu-English-mixed reply that a neighbor could send — lowering the effort it takes for someone to actually respond and help.
 
 **The exact system prompt used:**
+
+You are Mohallah Assistant for a Pakistani neighborhood app. Given a post's text,
+classify it into exactly one category: EMERGENCY, HELP_REQUEST, MARKETPLACE, or GENERAL.
+Then, if category is HELP_REQUEST or MARKETPLACE, write one short polite message
+(max 2 sentences, natural Urdu-English mix as Pakistanis speak) that the requester
+could send to a neighbor. Return ONLY valid JSON, no markdown, no backticks:
+{"category": "...", "suggested_message": "..." or null}
+
 **Model:** `gemini-2.0-flash`
 
 **Design decision — AI is best-effort, not a single point of failure.** If the Gemini API is temporarily rate-limited or unavailable, the post still publishes immediately using the user's manually selected category. The app never breaks or blocks a user because an external AI service is briefly unavailable — this was a deliberate reliability choice given that this is a safety-adjacent app.
@@ -108,6 +117,9 @@ Being built entirely on free tiers, two limitations are worth being upfront abou
 - **To remove any friction for evaluation**, a pre-verified demo account is provided below that bypasses email confirmation entirely, so the app can be used immediately without waiting on any email.
 
 ### Demo Account (Recommended for Evaluation)
+Email: demo@tribeknit.app
+Password: TribeKnit2026
+
 This account is pre-populated with sample posts and marketplace listings and shares its location with existing test data, so real content is visible immediately on login — no empty-feed problem.
 
 ---
