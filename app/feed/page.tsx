@@ -536,21 +536,23 @@ export default function FeedPage() {
             placeholder="Search a neighbor, e.g. Hibah Rehman or Demo..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-full px-4 py-2 text-sm bg-white/95 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5DCAA5]"
+            className="w-full rounded-full px-4 py-2 text-sm bg-white/95 text-[#2D3436] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5DCAA5]"
           />
 
           {searchQuery.trim().length === 0 && (
-            <p className="mt-2 px-1 text-[12px] sm:text-[11px] leading-tight text-gray-600">
-              Type a real name to test private messaging, like Hibah Rehman or Demo.
-            </p>
+            <div className="mt-2 rounded-xl border border-[#8CC9B4] bg-[#EAF7F2] px-3 py-2 shadow-sm">
+              <p className="text-[12px] sm:text-[11px] leading-tight font-medium text-[#0F5C5C]">
+                Type a real name to test private messaging, like Hibah Rehman or Demo.
+              </p>
+            </div>
           )}
 
           {searchQuery.trim().length > 0 && (
             <div className="absolute left-4 right-4 mt-1 bg-white rounded-xl shadow-lg z-20 max-h-64 overflow-y-auto">
               {searching ? (
-                <p className="text-center text-gray-500 text-xs py-4">Searching...</p>
+                <p className="text-center text-[#2D3436] text-xs py-4">Searching...</p>
               ) : searchResults.length === 0 ? (
-                <p className="text-center text-gray-500 text-xs py-4">No neighbors found.</p>
+                <p className="text-center text-[#2D3436] text-xs py-4">No neighbors found.</p>
               ) : (
                 searchResults.map((result) => (
                   <div
@@ -648,7 +650,7 @@ export default function FeedPage() {
             onChange={(e) => setContent(e.target.value)}
             required
             rows={3}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F5C5C] resize-none"
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-[#2D3436] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0F5C5C] resize-none"
           />
           <div className="mt-3">
             <label className="flex items-center gap-3 rounded-full bg-white border border-gray-200 pl-1 pr-4 py-1 cursor-pointer w-fit shadow-sm hover:shadow transition">
@@ -666,11 +668,11 @@ export default function FeedPage() {
               />
             </label>
           </div>
-          <div className="flex items-center gap-2 mt-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3">
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="text-sm border border-gray-200 rounded-lg px-2 py-1.5"
+              className="w-full text-sm border border-gray-200 rounded-lg px-2 py-2 bg-white text-[#2D3436]"
             >
               <option value="GENERAL">General</option>
               <option value="HELP_REQUEST">Help needed</option>
@@ -681,7 +683,7 @@ export default function FeedPage() {
             <button
               type="submit"
               disabled={posting}
-              className="ml-auto bg-[#D85A30] hover:opacity-90 text-white text-sm font-medium px-4 py-1.5 rounded-lg disabled:opacity-50"
+              className="w-full bg-[#D85A30] hover:opacity-90 text-white text-sm font-medium px-4 py-2 rounded-lg disabled:opacity-50"
             >
               {posting ? 'Posting...' : 'Post'}
             </button>
@@ -744,22 +746,22 @@ export default function FeedPage() {
                 <div className="flex items-center gap-4 mt-2 pt-2 border-t border-gray-100 text-xs">
                   <button
                     onClick={() => toggleLike(post.id)}
-                    className={post.isLiked ? 'text-[#D85A30] font-medium' : 'text-gray-500'}
+                    className={post.isLiked ? 'text-[#D85A30] font-medium' : 'text-[#2D3436]'}
                   >
                     {post.isLiked ? 'Liked' : 'Like'} ({post.likeCount})
                   </button>
-                  <button onClick={() => toggleComments(post.id)} className="text-gray-500">
+                  <button onClick={() => toggleComments(post.id)} className="text-[#2D3436]">
                     Comment ({post.comments.length})
                   </button>
                   {post.user_id !== currentUserId && (
                     <Link
                       href={`/messages/${post.user_id}?name=${encodeURIComponent(post.profiles?.full_name || 'Neighbor')}`}
-                      className="text-gray-500"
+                      className="text-[#2D3436]"
                     >
                       Message
                     </Link>
                   )}
-                  <span className="text-gray-500 ml-auto">
+                  <span className="text-[#2D3436] ml-auto">
                     {post.distance !== undefined ? post.distance.toFixed(1) : '0'} km away
                   </span>
                 </div>
@@ -801,7 +803,7 @@ export default function FeedPage() {
                 {post.commentsOpen && (
                   <div className="mt-3 pt-3 border-t border-gray-100 space-y-2">
                     {post.comments.map((c) => (
-                      <div key={c.id} className="flex items-start gap-2 bg-gray-50 rounded-lg px-3 py-2">
+                      <div key={c.id} className="flex items-start gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 shadow-sm">
                         <div className="w-6 h-6 rounded-full bg-[#0F5C5C] text-white text-[10px] font-medium flex items-center justify-center flex-shrink-0">
                           {initials(c.profiles?.full_name)}
                         </div>
@@ -825,7 +827,7 @@ export default function FeedPage() {
                               </button>
                             </div>
                           ) : (
-                            <p className="text-xs text-gray-600">{c.content}</p>
+                            <p className="text-xs text-[#2D3436]">{c.content}</p>
                           )}
                         </div>
                         {c.user_id === currentUserId && editingCommentId !== c.id && (
@@ -856,11 +858,11 @@ export default function FeedPage() {
                         placeholder="Write a comment..."
                         value={post.newComment}
                         onChange={(e) => updateNewComment(post.id, e.target.value)}
-                        className="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-[#0F5C5C]"
+                        className="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-[#2D3436] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0F5C5C]"
                       />
                       <button
                         onClick={() => submitComment(post.id)}
-                        className="bg-[#0F5C5C] text-white text-xs px-3 py-1.5 rounded-lg"
+                        className="bg-[#0F5C5C] text-white text-xs px-3 py-1.5 rounded-lg shrink-0"
                       >
                         Send
                       </button>

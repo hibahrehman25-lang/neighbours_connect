@@ -245,14 +245,14 @@ export default function MarketplacePage() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F5C5C]"
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-[#2D3436] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0F5C5C]"
           />
           <textarea
             placeholder="Description (optional)"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={2}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F5C5C] resize-none"
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-[#2D3436] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0F5C5C] resize-none"
           />
 
           <label className="flex items-center gap-3 rounded-full bg-white border border-gray-200 pl-1 pr-4 py-1 cursor-pointer w-fit shadow-sm hover:shadow transition">
@@ -270,11 +270,11 @@ export default function MarketplacePage() {
             />
           </label>
 
-          <div className="flex items-center gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <select
               value={type}
               onChange={(e) => setType(e.target.value)}
-              className="text-sm border border-gray-200 rounded-lg px-2 py-1.5"
+              className="w-full text-sm border border-gray-200 rounded-lg px-2 py-2 bg-white text-[#2D3436]"
             >
               <option value="SELL">Sell</option>
               <option value="RENT">Rent</option>
@@ -287,7 +287,7 @@ export default function MarketplacePage() {
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               required
-              className="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F5C5C]"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-[#2D3436] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0F5C5C]"
             />
           </div>
           <button
@@ -303,16 +303,16 @@ export default function MarketplacePage() {
           <div className="flex items-center justify-between mb-3">
             <div>
               <p className="text-sm font-semibold text-[#2D3436]">Marketplace filters</p>
-              <p className="text-[11px] text-gray-500">Quickly narrow down useful nearby listings</p>
+              <p className="text-[12px] sm:text-[11px] leading-tight text-gray-600">Quickly narrow down useful nearby listings</p>
             </div>
-            <p className="text-[11px] text-gray-500">{filteredItems.length} shown</p>
+            <p className="text-[12px] sm:text-[11px] leading-tight text-gray-600">{filteredItems.length} shown</p>
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <select
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white text-[#2D3436]"
             >
               <option value="ALL">All types</option>
               <option value="SELL">Sell</option>
@@ -324,7 +324,7 @@ export default function MarketplacePage() {
             <select
               value={maxDistanceFilter}
               onChange={(e) => setMaxDistanceFilter(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white text-[#2D3436]"
             >
               <option value="1">Within 1 km</option>
               <option value="0.75">Within 750 m</option>
@@ -337,7 +337,7 @@ export default function MarketplacePage() {
               placeholder="Min price"
               value={minPriceFilter}
               onChange={(e) => setMinPriceFilter(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white text-[#2D3436] placeholder:text-gray-400"
             />
             <input
               type="number"
@@ -345,7 +345,7 @@ export default function MarketplacePage() {
               placeholder="Max price"
               value={maxPriceFilter}
               onChange={(e) => setMaxPriceFilter(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white text-[#2D3436] placeholder:text-gray-400"
             />
           </div>
 
@@ -361,9 +361,9 @@ export default function MarketplacePage() {
         </div>
 
         {loading ? (
-          <p className="text-center text-gray-400 text-sm">Loading...</p>
+          <p className="text-center text-gray-500 text-sm">Loading...</p>
         ) : filteredItems.length === 0 ? (
-          <p className="text-center text-gray-400 text-sm py-10">
+          <p className="text-center text-gray-600 text-sm py-10">
             {items.length === 0
               ? 'No items yet within 1km of your location.'
               : 'No items match your current filters.'}
@@ -393,9 +393,9 @@ export default function MarketplacePage() {
                     {item.distance !== undefined ? `${item.distance.toFixed(1)} km away` : ''}
                   </span>
                 </div>
-                <p className="text-gray-800 text-sm font-medium">{item.title}</p>
+                <p className="text-[#2D3436] text-sm font-medium">{item.title}</p>
                 {item.description && (
-                  <p className="text-gray-500 text-xs mt-1">{item.description}</p>
+                  <p className="text-gray-600 text-xs mt-1">{item.description}</p>
                 )}
                 <p className="text-[#0F5C5C] text-sm font-semibold mt-2">{item.price}</p>
 
@@ -404,7 +404,7 @@ export default function MarketplacePage() {
                     <div className="w-6 h-6 rounded-full bg-[#0F5C5C] text-white text-[10px] font-medium flex items-center justify-center">
                       {initials(item.profiles?.full_name)}
                     </div>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-[#2D3436]">
                       {item.profiles?.full_name || 'Neighbor'}
                       {item.profiles?.verification_status === 'verified' && (
                         <span className="ml-2 text-[10px] font-medium text-[#0F5C5C]">Verified</span>
