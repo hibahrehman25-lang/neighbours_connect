@@ -256,11 +256,11 @@ export default function FeedPage() {
       })
       const aiResult = await res.json()
 
-      if (aiResult.category) {
+      if (aiResult?.category) {
         aiCategory = aiResult.category
       }
-      if (aiResult.suggested_message) {
-        aiSuggestedMessage = aiResult.suggested_message
+      if (typeof aiResult?.suggested_message === 'string' && aiResult.suggested_message.trim()) {
+        aiSuggestedMessage = aiResult.suggested_message.trim()
       }
     } catch {
       // AI is best-effort

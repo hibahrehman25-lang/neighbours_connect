@@ -15,6 +15,7 @@ type SosAlert = {
   longitude: number
   status: string
   created_at: string
+  ai_guidance?: string | null
   distance?: number
 }
 
@@ -25,6 +26,7 @@ export default function SosPage() {
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
   const [nearbyAlerts, setNearbyAlerts] = useState<SosAlert[]>([])
+  const [description, setDescription] = useState('')
 
   useEffect(() => {
     init()
@@ -144,15 +146,50 @@ export default function SosPage() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
-    await supabase.from('sos_alerts').insert({
+    let aiGuidance: string | null = null
+
+    try {
+      const res = await fetch('/api/sos-guidance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ description }),
+      })
+      const aiResult = await res.json()
+      if (Array.isArray(aiResult?.instructions)) {
+        aiGuidance = JSON.stringify(aiResult.instructions)
+      }
+    } catch {
+      // AI is best-effort
+    }
+
+    const insertPayload = {
       user_id: user.id,
       latitude: userLoc.lat,
       longitude: userLoc.lon,
       status: 'active',
-    })
+      ...(aiGuidance ? { ai_guidance: aiGuidance } : {}),
+    }
+
+    const { error } = await supabase.from('sos_alerts').insert(insertPayload)
+
+    if (error) {
+      const fallback = await supabase.from('sos_alerts').insert({
+        user_id: user.id,
+        latitude: userLoc.lat,
+        longitude: userLoc.lon,
+        status: 'active',
+      })
+
+      if (fallback.error) {
+        alert('SOS FAILED: ' + JSON.stringify(fallback.error))
+        setSending(false)
+        return
+      }
+    }
 
     setSending(false)
     setSent(true)
+    setDescription('')
 
     setTimeout(() => setSent(false), 4000)
   }
@@ -186,10 +223,18 @@ const deleteAlert = async (alertId: string) => {
       </header>
 
       <div className="max-w-lg mx-auto px-4 py-10 text-center">
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="What's happening? (optional — e.g. fire, break-in, medical)"
+          className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm focus:border-[#0F5C5C] focus:outline-none"
+          rows={3}
+        />
+
         <button
           onClick={handleSos}
           disabled={sending || !userLoc}
-          className="w-40 h-40 rounded-full bg-[#D85A30] hover:opacity-90 text-white text-2xl font-bold shadow-lg mx-auto flex items-center justify-center disabled:opacity-50 transition"
+          className="mt-4 w-40 h-40 rounded-full bg-[#D85A30] hover:opacity-90 text-white text-2xl font-bold shadow-lg mx-auto flex items-center justify-center disabled:opacity-50 transition"
         >
           {sending ? '...' : 'SOS'}
         </button>
@@ -256,6 +301,31 @@ const deleteAlert = async (alertId: string) => {
                       </button>
                     )}
                   </div>
+
+                  {alert.ai_guidance && (
+                    <div className="mt-3 rounded-lg border border-[#F4D9C6] bg-[#FFF8F2] p-3">
+                      <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-[#D85A30]">
+                        AI Safety Guidance
+                      </div>
+                      <ul className="space-y-1 text-sm text-gray-700">
+                        {(() => {
+                          try {
+                            const parsed = JSON.parse(alert.ai_guidance || '[]')
+                            return Array.isArray(parsed)
+                              ? parsed.map((instruction: string, index: number) => (
+                                  <li key={`${alert.id}-${index}`} className="flex gap-2">
+                                    <span className="text-[#D85A30]">•</span>
+                                    <span>{instruction}</span>
+                                  </li>
+                                ))
+                              : null
+                          } catch {
+                            return null
+                          }
+                        })()}
+                      </ul>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
