@@ -13,40 +13,40 @@ TribeKnit helps residents connect with verified neighbors living within a **1 km
 ---
 #
 ## 📸 Screenshots
-# signup page
+## signup page
 ![Map View](https://github.com/hibahrehman25-lang/neighbours_connect/blob/main/Screenshot%202026-07-26%20214225.png)
 
-# login page
+## login page
 ![SOS Alert](https://github.com/hibahrehman25-lang/neighbours_connect/blob/main/Screenshot%202026-07-26%20214205.png)
 
-# logo splash screen
+## logo splash screen
 ![Marketplace](https://github.com/hibahrehman25-lang/neighbours_connect/blob/main/Screenshot%202026-07-26%20214139.png)
 
-# Profile page 
+## Profile page 
 ![Post Interaction](https://github.com/hibahrehman25-lang/neighbours_connect/blob/main/Screenshot%202026-07-26%20214019.png)
 
-# sos emergency button with emergy alaram and notification
+## sos emergency button with emergy alaram and notification
 ![Neighborhood Feed](https://github.com/hibahrehman25-lang/neighbours_connect/blob/main/Screenshot%202026-07-26%20213904.png)
 
-# sos map 
+## sos map 
 ![Private Messaging](https://github.com/hibahrehman25-lang/neighbours_connect/blob/main/Screenshot%202026-07-26%20213839.png)
 
-# Market Place with price filters 
+## Market Place with price filters 
 ![Nearby Search](https://github.com/hibahrehman25-lang/neighbours_connect/blob/main/Screenshot%202026-07-26%20213738.png)
 
-# Market place Dashboard
+## Ai based suggestion for comments and natural language understanding plus post page automatically cateogry selected based upon message nature
 ![Marketplace Filters](https://github.com/hibahrehman25-lang/neighbours_connect/blob/main/Screenshot%202026-07-26%20213603.png)
 
-# Ai based suggestion for comments and natural language understanding plus post page automatically cateogry selected based upon message nature 
+## Feed page dashboard
 ![Create Post](https://github.com/hibahrehman25-lang/neighbours_connect/blob/main/Screenshot%202026-07-26%20213408.png)
 
 # Private Chat interface 
 ![Map View 2](https://github.com/hibahrehman25-lang/neighbours_connect/blob/main/Screenshot%202026-07-26%20213253.png)
 
-# Map for Feed messages 
+## Map for Feed messages 
 ![Map View](https://github.com/hibahrehman25-lang/neighbours_connect/blob/main/Screenshot%202026-07-26%20213214.png)
 
-# The Problem
+## The Problem
 
 Modern lifestyles have made neighborhoods less connected than ever. Most people barely know the families living around them, even though those same neighbors are often the first people who could help during an emergency.
 
