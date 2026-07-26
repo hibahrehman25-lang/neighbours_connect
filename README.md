@@ -46,6 +46,9 @@ TribeKnit helps residents connect with verified neighbors living within a **1 km
 ## Map for Feed messages 
 ![Map View](https://github.com/hibahrehman25-lang/neighbours_connect/blob/main/Screenshot%202026-07-26%20213214.png)
 
+## Edit and Delete function in post plus comment section
+![Map View](https://github.com/hibahrehman25-lang/neighbours_connect/blob/main/Screenshot%202026-07-26%20223452.png)
+
 ## The Problem
 
 Modern lifestyles have made neighborhoods less connected than ever. Most people barely know the families living around them, even though those same neighbors are often the first people who could help during an emergency.
