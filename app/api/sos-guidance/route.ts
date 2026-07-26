@@ -14,9 +14,9 @@ instructions instead. Return ONLY valid JSON, no markdown, no backticks:
 {"instructions": ["...", "...", "..."]}`
 
 const FALLBACK_INSTRUCTIONS = [
-  'Stay calm and move to a safe location',
-  'Alert nearby neighbors if possible',
-  'Contact emergency services if needed',
+  'Stay calm and assess your surroundings',
+  'Move to the nearest safe location if possible',
+  'Keep your phone accessible in case you need to call for help',
 ]
 
 function normalizeInstructions(value: unknown) {
@@ -41,6 +41,7 @@ export async function POST(req: NextRequest) {
     const description = typeof body?.description === 'string' ? body.description.trim() : ''
 
     if (!apiKey || !genAI) {
+      console.error('SOS AI fallback triggered:', 'Missing API key or Gemini client')
       return NextResponse.json({ instructions: FALLBACK_INSTRUCTIONS })
     }
 
@@ -69,12 +70,14 @@ export async function POST(req: NextRequest) {
     let parsed: any = null
     try {
       parsed = JSON.parse(cleaned)
-    } catch {
+    } catch (error) {
+      console.error('SOS AI fallback triggered:', error)
       return NextResponse.json({ instructions: FALLBACK_INSTRUCTIONS })
     }
 
     return NextResponse.json({ instructions: normalizeInstructions(parsed.instructions) })
-  } catch {
+  } catch (error) {
+    console.error('SOS AI fallback triggered:', error)
     return NextResponse.json({ instructions: FALLBACK_INSTRUCTIONS })
   }
 }

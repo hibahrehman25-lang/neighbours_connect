@@ -51,7 +51,12 @@ export default function SignupPage() {
         setLoading(false)
 
         if (signUpError) {
-          setError(signUpError.message)
+          const message = signUpError.message?.toLowerCase() || ''
+          if (message.includes('already registered') || message.includes('already exists')) {
+            setError('This email is already registered. Please log in instead.')
+          } else {
+            setError('Something went wrong. Please check your details and try again.')
+          }
           return
         }
 
