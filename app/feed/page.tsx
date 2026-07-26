@@ -688,48 +688,42 @@ export default function FeedPage() {
           </div>
         </form>
 
-        <div className="flex justify-end mb-3">
-          <button
-            onClick={() => setShowMap(!showMap)}
-            className="flex items-center gap-1.5 text-xs bg-white/80 backdrop-blur-md border border-white/60 shadow-sm px-4 py-2 rounded-full font-medium text-[#0F5C5C] hover:bg-white transition"
-          >
-            <span>{showMap ? '☰' : '📍'}</span>
-            {showMap ? 'List View' : 'Map View'}
-          </button>
-        </div>
-
-        {showMap && userLoc && (
-          <div className="mb-4 rounded-2xl overflow-hidden border border-gray-200 shadow-sm">
-            <MapView
-              centerLat={userLoc.lat}
-              centerLon={userLoc.lon}
-              pins={posts.map((p) => ({
-                id: p.id,
-                lat: p.latitude,
-                lon: p.longitude,
-                label: p.content.slice(0, 40),
-                color:
-                  p.category === 'EMERGENCY'
-                    ? '#D93E3E'
-                    : p.category === 'LOST_FOUND'
-                    ? '#EF9F27'
-                    : p.category === 'MARKETPLACE'
-                    ? '#3DA35D'
-                    : '#0F5C5C',
-              }))}
-            />
-          </div>
-
-                  {!showMap && userLoc && (
-                    <div className="mb-4 flex justify-end">
-                      <button
-                        onClick={() => setShowMap(true)}
-                        className="flex items-center gap-1.5 text-xs bg-white border border-gray-200 shadow-sm px-4 py-2 rounded-full font-medium text-[#0F5C5C]"
-                      >
-                        📍 Show map
-                      </button>
+        {loading ? (
+          <p className="text-center text-gray-400 text-sm">Loading...</p>
+        ) : posts.length === 0 ? (
+          <p className="text-center text-gray-400 text-sm py-10">
+            No nearby posts yet within 1km of your location.
+          </p>
+        ) : (
+          <div className="space-y-3">
+            {posts.map((post) => (
+              <div key={post.id} className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-[#0F5C5C] text-white text-xs font-medium flex items-center justify-center">
+                      {initials(post.profiles?.full_name)}
                     </div>
-                  )}
+                    <div>
+                      <p className="text-sm font-medium text-[#2D3436]">
+                        {post.profiles?.full_name || 'Neighbor'}
+                      </p>
+                      <p className="text-[11px] text-gray-400">
+                        {new Date(post.created_at).toLocaleDateString('en-PK', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric',
+                          timeZone: 'Asia/Karachi',
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                  <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${CATEGORY_STYLES[post.category] || CATEGORY_STYLES.GENERAL}`}>
+                    {CATEGORY_LABELS[post.category] || post.category}
+                  </span>
+                </div>
+
+                <p className="text-sm text-gray-700 mt-3 whitespace-pre-wrap">{post.content}</p>
+
                 {post.image_url && (
                   <a href={post.image_url} target="_blank" rel="noopener noreferrer">
                     <img
@@ -754,10 +748,7 @@ export default function FeedPage() {
                   >
                     {post.isLiked ? 'Liked' : 'Like'} ({post.likeCount})
                   </button>
-                  <button
-                    onClick={() => toggleComments(post.id)}
-                    className="text-gray-500"
-                  >
+                  <button onClick={() => toggleComments(post.id)} className="text-gray-500">
                     Comment ({post.comments.length})
                   </button>
                   {post.user_id !== currentUserId && (
