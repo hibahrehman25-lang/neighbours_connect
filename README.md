@@ -11,9 +11,41 @@ TribeKnit helps residents connect with verified neighbors living within a **1 km
 **💻 Source Code:** https://github.com/hibahrehman25-lang/neighbours_connect
 
 ---
-#
+## Table of Contents
+The Problem
+Who it's For
+Why tribeKnit
+Screenshots
+Features
+AI Features
+Future Improvements
+Technology Stack
+Architecture
+How Supabase Powers TribeKnit
+Demo Account
+Run Locally
+License
+Acknowledgements
+About the Developer
+
+## The Problem
+
+Modern lifestyles have made neighborhoods less connected than ever. Most people barely know the families living around them, even though those same neighbors are often the first people who could help during an emergency.
+
+Whether it's a medical emergency, a theft, a power outage, a lost pet, borrowing household tools, or selling unused items, people usually rely on scattered WhatsApp or Facebook groups that are noisy, unverified, and not location-aware. As a result, nearby residents who could help often never even know someone needs assistance.
+
+**TribeKnit** solves this problem by creating a verified hyperlocal community where residents within a real **1 km radius** can safely communicate, receive real-time alerts, share updates, lend a helping hand, and support one another.
+
+
+## Who It's For 
+
+For: Residents of neighborhoods and housing societies in Pakistan who don't really know the people living around them and want a safer, faster way to reach help, share alerts, and trade locally without relying on noisy, unverified WhatsApp or Facebook groups.
+### Why: 
+Because in an actual emergency, the neighbor two houses down can help faster than anyone on the internet TribeKnit just makes sure they know you need it, in real time, and only within a radius that's actually relevant to them.
+
+
 ## 📸 Screenshots
-## signup page
+## Signup Page GPS + document verification onboarding
 ![Map View](https://github.com/hibahrehman25-lang/neighbours_connect/blob/main/Screenshot%202026-07-26%20214225.png)
 
 ## login page
@@ -25,10 +57,10 @@ TribeKnit helps residents connect with verified neighbors living within a **1 km
 ## Profile page 
 ![Post Interaction](https://github.com/hibahrehman25-lang/neighbours_connect/blob/main/Screenshot%202026-07-26%20214019.png)
 
-## sos emergency button with emergy alaram and notification
+## SOS Emergency Button - alarm + notification
 ![Neighborhood Feed](https://github.com/hibahrehman25-lang/neighbours_connect/blob/main/Screenshot%202026-07-26%20213904.png)
 
-## sos map 
+## sos live map 
 ![Private Messaging](https://github.com/hibahrehman25-lang/neighbours_connect/blob/main/Screenshot%202026-07-26%20213839.png)
 
 ## Market Place with price filters 
@@ -37,25 +69,17 @@ TribeKnit helps residents connect with verified neighbors living within a **1 km
 ## Ai based suggestion for comments and natural language understanding plus post page automatically cateogry selected based upon message nature
 ![Marketplace Filters](https://github.com/hibahrehman25-lang/neighbours_connect/blob/main/Screenshot%202026-07-26%20213603.png)
 
-## Feed page dashboard
+## Feed dashboard
 ![Create Post](https://github.com/hibahrehman25-lang/neighbours_connect/blob/main/Screenshot%202026-07-26%20213408.png)
 
 # Private Chat interface 
 ![Map View 2](https://github.com/hibahrehman25-lang/neighbours_connect/blob/main/Screenshot%202026-07-26%20213253.png)
 
-## Map for Feed messages 
+## Feed Map View
 ![Map View](https://github.com/hibahrehman25-lang/neighbours_connect/blob/main/Screenshot%202026-07-26%20213214.png)
 
-## Edit and Delete function in post plus comment section
+## Show Image	Edit/Delete Post & Comments
 ![Map View](https://github.com/hibahrehman25-lang/neighbours_connect/blob/main/Screenshot%202026-07-26%20223452.png)
-
-## The Problem
-
-Modern lifestyles have made neighborhoods less connected than ever. Most people barely know the families living around them, even though those same neighbors are often the first people who could help during an emergency.
-
-Whether it's a medical emergency, a theft, a power outage, a lost pet, borrowing household tools, or selling unused items, people usually rely on scattered WhatsApp or Facebook groups that are noisy, unverified, and not location-aware. As a result, nearby residents who could help often never even know someone needs assistance.
-
-**TribeKnit** solves this problem by creating a verified hyperlocal community where residents within a real **1 km radius** can safely communicate, receive real-time alerts, share updates, lend a helping hand, and support one another.
 
 ---
 
@@ -149,6 +173,31 @@ This helps prevent important posts from being incorrectly categorized by users.
 
 For **Help Request** and **Marketplace** posts, Gemini also generates a short Urdu-English reply suggestion, making it easier for neighbors to respond quickly.
 
+### System Prompts used
+You are a classification assistant for a hyperlocal neighborhood app called TribeKnit.
+
+Read the user's post content below and classify it into EXACTLY ONE of these
+four categories: "emergency", "help_request", "marketplace", "general".
+
+Rules:
+- "emergency": fire, medical crisis, security threat, accident, or anything
+  requiring immediate neighbor attention.
+- "help_request": non-urgent requests for assistance, borrowing items,
+  lost & found, favors.
+- "marketplace": buying, selling, renting, or offering goods/services.
+- "general": community updates, announcements, casual conversation.
+
+If the category is "help_request" or "marketplace", also generate a short,
+natural reply suggestion a neighbor could send back, written in a casual
+mix of Urdu and English (Roman Urdu), under 20 words.
+
+Respond ONLY in this JSON format, with no extra text:
+{
+  "category": "<emergency|help_request|marketplace|general>",
+  "reply_suggestion": "<string or null>"
+}
+
+Post content: "{{post_text}}"
 ---
 
 ## AI SOS Safety Guidance
@@ -165,6 +214,24 @@ Examples include guidance for:
 * Power outages
 * General emergencies
 
+### System prompt
+You are an emergency safety assistant for a neighborhood alert system called
+TribeKnit. A resident has triggered an SOS alert and optionally described
+their situation below.
+
+Generate exactly THREE short, clear, actionable safety instructions
+(each under 15 words) that nearby residents and the person in danger can
+follow immediately. Prioritize physical safety, calling professional
+emergency services, and simple first steps.
+
+Do not diagnose medical conditions. Do not give instructions requiring
+specialized equipment. Keep language simple and calm.
+
+Respond ONLY as a JSON array of exactly 3 strings, no extra text:
+["instruction 1", "instruction 2", "instruction 3"]
+
+Situation description: "{{situation_text}}"
+(If empty, provide general emergency guidance.)
 ---
 
 ## Reliability First
@@ -211,6 +278,44 @@ Planned features include:
 | Branding       | Canva                                             |
 
 ---
+
+# Architecture
+┌─────────────────────┐
+│   User's Browser     │
+│  (Next.js 16 Client) │
+└──────────┬───────────┘
+           │  HTTPS
+           ▼
+┌─────────────────────────────┐
+│   Next.js App Router         │
+│   (Frontend + API Routes)    │
+│                               │
+│  /api/classify-post  ───────┼───┐
+│  /api/sos-guidance   ───────┼───┤
+└──────────┬────────────────┬──┘   │
+           │                │      ▼
+           │                │  ┌────────────────────┐
+           │                │  │  Google Gemini 2.0   │
+           │                │  │  Flash (AI layer)    │
+           │                │  └────────────────────┘
+           ▼                ▼
+┌─────────────────────────────────────┐
+│              Supabase                │
+│  ┌───────────┐ ┌────────────────┐    │
+│  │   Auth    │ │  PostgreSQL DB  │    │
+│  └───────────┘ │  + Row Level    │    │
+│  ┌───────────┐ │  Security (RLS) │    │
+│  │  Realtime │ └────────────────┘    │
+│  │ (SOS/chat)│ ┌────────────────┐    │
+│  └───────────┘ │    Storage      │    │
+│                │ (photos/docs)   │    │
+│                └────────────────┘    │
+└─────────────────────────────────────┘
+           ▲
+           │  Map tiles (no API key)
+┌──────────┴───────────┐
+│  Leaflet + OpenStreetMap │
+└─────────────────────────┘
 
 # How Supabase Powers TribeKnit
 
@@ -303,6 +408,9 @@ https://neighbours-connect-ause.vercel.app
 https://github.com/hibahrehman25-lang/neighbours_connect
 
 ---
+# License
+
+This project is licensed under the MIT License — feel free to fork and build on it.
 
 # Acknowledgements
 
