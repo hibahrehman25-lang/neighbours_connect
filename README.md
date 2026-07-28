@@ -12,21 +12,22 @@ TribeKnit helps residents connect with verified neighbors living within a **1 km
 
 ---
 ## Table of Contents
-The Problem
-Who it's For
-Why tribeKnit
-Screenshots
-Features
-AI Features
-Future Improvements
-Technology Stack
-Architecture
-How Supabase Powers TribeKnit
-Demo Account
-Run Locally
-License
-Acknowledgements
-About the Developer
+- [The Problem](#the-problem)
+- [Who it's For](#who-its-for)
+- [Why tribeKnit](#why-tribeknit)
+- [Screenshots](#screenshots)
+- [Features](#features)
+- [AI Features](#ai-features)
+- [Future Improvements](#future-improvements)
+- [Technology Stack](#technology-stack)
+- [Architecture](#architecture)
+- [How Supabase Powers TribeKnit](#how-supabase-powers-tribeknit)
+- [Demo Account](#demo-account)
+- [Run Locally](#run-locally)
+- [License](#license)
+- [Acknowledgements](#acknowledgements)
+- [About the Developer](#about-the-developer)
+- 
 
 ## The Problem
 
